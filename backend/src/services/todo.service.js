@@ -1,8 +1,9 @@
 let tasks = [
   { id: 1, title: ' UI להגביל את ה' },
-  { id: 2, title: 'להאיץ את האפליקציה' }
+  { id: 2, title: 'להאיץ את האפליקציה' },
+  { id: 3, title: 'לעדכן את התיעוד' }
 ];
-let nextId = 3;
+let nextId = 4;
 
 const getAllTodos = () => {
   return tasks;
