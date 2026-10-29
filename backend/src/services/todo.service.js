@@ -1,6 +1,6 @@
 let tasks = [
-  { id: 1, title: 'להגדיר את GitHub Actions' },
-  { id: 2, title: 'לבצע Deployment ב-OpenShift' }
+  { id: 1, title: ' UI להגביל את ה' },
+  { id: 2, title: 'להאיץ את האפליקציה' }
 ];
 let nextId = 3;
 
