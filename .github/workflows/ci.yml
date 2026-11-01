@@ -1,5 +1,4 @@
 name: Build and Push Docker Images
-
 on:
   push:
     branches:
@@ -7,7 +6,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  # המשתנה הזה ייקח את שם המשתמש והפרויקט שלך אוטומטית (למשל: jakeos987/my-devops-app)
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
@@ -29,7 +27,6 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       # צעד 3: בניית ה-Image ודחיפתו לענן
       - name: Build and push Backend
         uses: docker/build-push-action@v4

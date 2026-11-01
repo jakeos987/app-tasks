@@ -6,16 +6,11 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-# שלב 2: שרת Nginx
-FROM nginx:alpine
+# שלב 2: Nginx ללא הרשאות (Unprivileged)
+FROM nginxinc/nginx-unprivileged:alpine
+# דריסת קובץ הניתוב של ברירת המחדל בקובץ שלנו
+COPY default.conf /etc/nginx/conf.d/default.conf
+# העתקת תוצרי ה-React
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# העתקת קובץ הקונפיגורציה שלנו שדורס את ברירת המחדל
-COPY nginx.conf /etc/nginx/nginx.conf
-
-# פתרון קסם ל-OpenShift: הענקת הרשאות כתיבה (w) לקבוצה 0 בתיקיות הליבה של Nginx
-RUN chown -R 101:0 /var/cache/nginx /var/run /var/log/nginx /usr/share/nginx/html && \
-    chmod -R g+rwX /var/cache/nginx /var/run /var/log/nginx /usr/share/nginx/html
-
 EXPOSE 8080
-CMD ["nginx", "-g", "daemon off;"]
