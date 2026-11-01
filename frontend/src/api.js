@@ -1,5 +1,5 @@
 // משתמשים במשתנה סביבה עבור OpenShift, עם Fallback לפיתוח מקומי
-const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000/api/todos';
+const API_URL = "backend-api-jakeos-dev.apps.rm3.7wse.p1.openshiftapps.com" || 'http://localhost:3000/api/todos';
 
 export const getTodos = async () => {
   const response = await fetch(API_URL);
