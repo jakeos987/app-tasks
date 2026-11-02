@@ -1,4 +1,5 @@
 name: Build and Push Docker Images
+
 on:
   push:
     branches:
@@ -16,18 +17,16 @@ jobs:
       packages: write
 
     steps:
-      # צעד 1: משיכת הקוד מהריפוזיטורי אל ה-Runner הווירטואלי
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # צעד 2: התחברות ל-Registry של גיטהאב כדי שנוכל לדחוף לשם קונטיינרים
       - name: Log in to the Container registry
         uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      # צעד 3: בניית ה-Image ודחיפתו לענן
+
       - name: Build and push Backend
         uses: docker/build-push-action@v4
         with:
@@ -60,9 +59,15 @@ jobs:
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:latest
 
   deploy-to-openshift:
-    needs: [build-and-push-backend, build-and-push-frontend] # ה-Job הזה ירוץ רק אחרי שהבנייה תסתיים בהצלחה
+    needs: [build-and-push-backend, build-and-push-frontend]
     runs-on: ubuntu-latest
+
     steps:
+      # התקנת OpenShift CLI
+      - name: Install OpenShift CLI
+        uses: redhat-actions/oc-installer@v1
+
+      # התחברות ל-OpenShift
       - name: Log in to OpenShift
         uses: redhat-actions/oc-login@v1
         with:
@@ -71,16 +76,14 @@ jobs:
           insecure_skip_tls_verify: true
           namespace: jakeos-dev
 
+      # עדכון ImageStreams והפעלת Deployments
       - name: Update ImageStream and Rollout
         run: |
-          # רענון הרישום כדי לוודא משיכה של ה-SHA העדכני מגיטהאב
           oc import-image backend-api:latest || true
           oc import-image frontend-ui:latest || true
-          
-          # הפעלה מחדש של הפודים עם האימג' החדש
+
           oc rollout restart deployment/backend-api
           oc rollout restart deployment/frontend-ui
-          
-          # המתנה לווידוא שהפודים עלו בהצלחה
+
           oc rollout status deployment/backend-api
           oc rollout status deployment/frontend-ui
