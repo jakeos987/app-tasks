@@ -77,13 +77,7 @@ jobs:
           namespace: jakeos-dev
 
       # עדכון ImageStreams והפעלת Deployments
-      - name: Update ImageStream and Rollout
+      - name: Update ImageStream
         run: |
-          oc import-image backend-api:latest || true
-          oc import-image frontend-ui:latest || true
-
-          oc rollout restart deployment/backend-api
-          oc rollout restart deployment/frontend-ui
-
-          oc rollout status deployment/backend-api
-          oc rollout status deployment/frontend-ui
+          oc import-image backend-api:latest
+          oc import-image frontend-ui:latest
