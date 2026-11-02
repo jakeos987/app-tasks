@@ -58,3 +58,29 @@ jobs:
           context: ./frontend
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:latest
+
+  deploy-to-openshift:
+    needs: [build-and-push-backend, build-and-push-frontend] # ה-Job הזה ירוץ רק אחרי שהבנייה תסתיים בהצלחה
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log in to OpenShift
+        uses: redhat-actions/oc-login@v1
+        with:
+          openshift_server_url: ${{ secrets.OPENSHIFT_SERVER }}
+          openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
+          insecure_skip_tls_verify: true
+          namespace: jakeos-dev
+
+      - name: Update ImageStream and Rollout
+        run: |
+          # רענון הרישום כדי לוודא משיכה של ה-SHA העדכני מגיטהאב
+          oc import-image backend-api:latest || true
+          oc import-image frontend-ui:latest || true
+          
+          # הפעלה מחדש של הפודים עם האימג' החדש
+          oc rollout restart deployment/backend-api
+          oc rollout restart deployment/frontend-ui
+          
+          # המתנה לווידוא שהפודים עלו בהצלחה
+          oc rollout status deployment/backend-api
+          oc rollout status deployment/frontend-ui
