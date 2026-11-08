@@ -34,7 +34,7 @@ function App() {
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif', maxWidth: '600px', margin: '0 auto' }}>
-      <h1>✅✅✅✅ משימות CI/CD</h1>
+      <h1>✅✅ משימות CI/CD</h1>
       <h1>Ben was here</h1>
       <form onSubmit={handleAddTodo} style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
         <input 
