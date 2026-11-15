@@ -1,13 +1,19 @@
-version: '3.8'
+#version: '3.8'
 services:
   backend:
     build: ./backend
     ports:
       - "3000:3000"
+    volumes:
+    # מחבר תיקייה מקומית בשם 'backend-data' לנתיב שבו ה-SQLite נשמר
+      - ./backend-data:/app/data
   
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:3000/api/todos
     ports:
-      - "8080:80"
+      - "8080:8080"
     depends_on:
       - backend

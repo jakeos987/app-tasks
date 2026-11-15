@@ -1,21 +1,21 @@
 const todoService = require('../services/todo.service');
 
-const getTodos = (req, res) => {
-  const todos = todoService.getAllTodos();
+const getTodos = async (req, res) => {
+  const todos = await todoService.getAllTodos();
   res.json(todos);
 };
 
-const createTodo = (req, res) => {
+const createTodo = async (req, res) => {
   if (!req.body.title) {
     return res.status(400).json({ error: 'Title is required' });
   }
-  const newTodo = todoService.createTodo(req.body.title);
+  const newTodo = await todoService.createTodo(req.body.title);
   res.status(201).json(newTodo);
 };
 
-const deleteTodo = (req, res) => {
+const deleteTodo = async (req, res) => {
   const id = parseInt(req.params.id);
-  const isDeleted = todoService.deleteTodo(id);
+  const isDeleted = await todoService.deleteTodo(id);
   
   if (isDeleted) {
     res.json({ message: 'Task deleted successfully' });

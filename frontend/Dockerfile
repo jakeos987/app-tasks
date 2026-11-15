@@ -4,6 +4,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
+ARG VITE_API_URL=https://backend-api-jakeos-dev.apps.rm3.7wse.p1.openshiftapps.com/api/todos
+ENV VITE_API_URL=$VITE_API_URL
 RUN npm run build
 
 # שלב 2: Nginx ללא הרשאות (Unprivileged)

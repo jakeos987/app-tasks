@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "backend": "file:backend",
+    "sqlite3": "^6.0.1"
+  }
+}

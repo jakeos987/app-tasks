@@ -1,24 +1,18 @@
-let tasks = [
-  { id: 1, title: ' UI להגביל את ה' },
-  { id: 2, title: 'להאיץ את האפליקציה' },
-  { id: 3, title: 'לעדכן את התיעוד' }
-];
-let nextId = 4;
+const AppDataSource = require('../data-source');
+
+const getRepository = () => AppDataSource.getRepository('Todo');
 
 const getAllTodos = () => {
-  return tasks;
+  return getRepository().find();
 };
 
 const createTodo = (title) => {
-  const newTask = { id: nextId++, title };
-  tasks.push(newTask);
-  return newTask;
+  return getRepository().save({ title });
 };
 
-const deleteTodo = (id) => {
-  const initialLength = tasks.length;
-  tasks = tasks.filter(task => task.id !== id);
-  return tasks.length < initialLength;
+const deleteTodo = async (id) => {
+  const result = await getRepository().delete(id);
+  return result.affected > 0;
 };
 
 module.exports = { getAllTodos, createTodo, deleteTodo };
