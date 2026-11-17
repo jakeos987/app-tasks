@@ -12,6 +12,7 @@ services:
     # מחבר תיקייה מקומית בשם 'backend-data' לנתיב שבו ה-SQLite נשמר
       - ./backend-data:/app/data
   
+  
   frontend:
     build:
       context: ./frontend
