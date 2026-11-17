@@ -2,6 +2,10 @@
 services:
   backend:
     build: ./backend
+    environment:
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      JWT_USER: ${JWT_USER:?Set JWT_USER in .env}
+      JWT_PASSWORD: ${JWT_PASSWORD:?Set JWT_PASSWORD in .env}
     ports:
       - "3000:3000"
     volumes:

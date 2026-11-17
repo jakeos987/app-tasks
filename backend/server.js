@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const todoRoutes = require('./src/routes/todo.routes');
+const authRoutes = require('./src/auth/auth.routes');
+const authMiddleware = require('./src/auth/auth.middleware');
 const AppDataSource = require('./src/data-source'); // ייבוא אובייקט החיבור שיצרנו
 
 const app = express();
@@ -15,7 +17,8 @@ app.use(cors({
 app.use(express.json());
 
 // רישום הראוטים תחת נתיב בסיס
-app.use('/api/todos', todoRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/todos', authMiddleware, todoRoutes);
 
 // אתחול מסד הנתונים ורק אז הפעלת השרת
 AppDataSource.initialize()

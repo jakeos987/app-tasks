@@ -4,38 +4,85 @@ import { getTodos, createTodo, deleteTodo } from './api';
 function App() {
   const [todos, setTodos] = useState([]);
   const [title, setTitle] = useState('');
-
-  const fetchTodos = async () => {
-    try {
-      const data = await getTodos();
-      setTodos(data);
-    } catch (err) {
-      console.error("Error fetching tasks:", err);
-    }
-  };
+  const [token, setToken] = useState(() => localStorage.getItem('token'));
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    fetchTodos();
-  }, []);
+    if (!token) return;
+
+    let active = true;
+    getTodos()
+      .then((data) => {
+        if (active) setTodos(data);
+      })
+      .catch((err) => {
+        if (!active) return;
+        setError(err.message);
+        if (err.status === 401) {
+          localStorage.removeItem('token');
+          setToken(null);
+          setTodos([]);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [token]);
 
   const handleAddTodo = async (e) => {
     e.preventDefault();
     if (!title) return;
-    
-    await createTodo(title);
-    setTitle('');
-    fetchTodos();
+    try {
+      await createTodo(title);
+      setTodos(await getTodos());
+      setTitle('');
+      setError('');
+    } catch (err) {
+      setError(err.message);
+      if (err.status === 401) {
+        localStorage.removeItem('token');
+        setToken(null);
+        setTodos([]);
+      }
+    }
   };
 
   const handleDelete = async (id) => {
-    await deleteTodo(id);
-    fetchTodos();
+    try {
+      await deleteTodo(id);
+      setTodos(await getTodos());
+      setError('');
+    } catch (err) {
+      setError(err.message);
+      if (err.status === 401) {
+        localStorage.removeItem('token');
+        setToken(null);
+        setTodos([]);
+      }
+    }
   };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setToken(null);
+    setTodos([]);
+    setError('');
+  };
+
+  if (!token) {
+
+    return (
+      <h1> there is no token</h1>
+    );
+  }
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif', maxWidth: '600px', margin: '0 auto' }}>
       <h1>✅✅ משימות CI/CD</h1>
       <h1>Ben was here</h1>
+      <button onClick={handleLogout}>התנתקות</button>
+      {error && <p role="alert">{error}</p>}
       <form onSubmit={handleAddTodo} style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
         <input 
           value={title} 
