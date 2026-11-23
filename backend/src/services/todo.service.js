@@ -5,6 +5,7 @@ if (!Number.isSafeInteger(tasksPerPage) || tasksPerPage < 1) {
   throw new Error('TASKS_PER_PAGE must be a positive integer');
 }
 
+
 const getRepository = () => AppDataSource.getRepository('Todo');
 
 const getTodos = async (page) => {
