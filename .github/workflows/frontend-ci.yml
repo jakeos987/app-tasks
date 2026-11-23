@@ -1,39 +1,18 @@
-name: Build and Push Docker Images
+name: Frontend CI/CD
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-ci.yml'
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build-and-push-backend:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Log in to the Container registry
-        uses: docker/login-action@v2
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push Backend
-        uses: docker/build-push-action@v4
-        with:
-          context: ./backend
-          push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backend:latest
-
   build-and-push-frontend:
     runs-on: ubuntu-latest
     permissions:
@@ -58,16 +37,14 @@ jobs:
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:latest
 
-  deploy-to-openshift:
-    needs: [build-and-push-backend, build-and-push-frontend]
+  deploy-frontend:
+    needs: build-and-push-frontend
     runs-on: ubuntu-latest
 
     steps:
-      # התקנת OpenShift CLI
       - name: Install OpenShift CLI
         uses: redhat-actions/oc-installer@v1
 
-      # התחברות ל-OpenShift
       - name: Log in to OpenShift
         uses: redhat-actions/oc-login@v1
         with:
@@ -76,8 +53,5 @@ jobs:
           insecure_skip_tls_verify: true
           namespace: jakeos-dev
 
-      # עדכון ImageStreams והפעלת Deployments
-      - name: Update ImageStream
-        run: |
-          oc import-image backend-api:latest
-          oc import-image frontend-ui:latest
+      - name: Update Frontend ImageStream
+        run: oc import-image frontend-ui:latest
