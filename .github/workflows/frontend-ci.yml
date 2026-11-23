@@ -8,6 +8,7 @@ on:
       - 'frontend/**'
       - '.github/workflows/frontend-ci.yml'
 
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
