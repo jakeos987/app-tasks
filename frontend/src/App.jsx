@@ -3,6 +3,8 @@ import { getTodos, createTodo, deleteTodo } from './api';
 
 function App() {
   const [todos, setTodos] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [title, setTitle] = useState('');
   const [token, setToken] = useState(() => localStorage.getItem('token'));
   const [error, setError] = useState('');
@@ -11,9 +13,15 @@ function App() {
     if (!token) return;
 
     let active = true;
-    getTodos()
-      .then((data) => {
-        if (active) setTodos(data);
+    getTodos(page)
+      .then(({ todos: data, totalPages: pages }) => {
+        if (!active) return;
+        if (page > pages && pages > 0) {
+          setPage(pages);
+          return;
+        }
+        setTodos(data);
+        setTotalPages(Math.max(pages, 1));
       })
       .catch((err) => {
         if (!active) return;
@@ -28,14 +36,20 @@ function App() {
     return () => {
       active = false;
     };
-  }, [token]);
+  }, [token, page]);
 
   const handleAddTodo = async (e) => {
     e.preventDefault();
     if (!title) return;
     try {
       await createTodo(title);
-      setTodos(await getTodos());
+      const result = await getTodos(page);
+      setTotalPages(Math.max(result.totalPages, 1));
+      if (result.totalPages > page) {
+        setPage(result.totalPages);
+      } else {
+        setTodos(result.todos);
+      }
       setTitle('');
       setError('');
     } catch (err) {
@@ -51,7 +65,13 @@ function App() {
   const handleDelete = async (id) => {
     try {
       await deleteTodo(id);
-      setTodos(await getTodos());
+      const result = await getTodos(page);
+      setTotalPages(Math.max(result.totalPages, 1));
+      if (page > result.totalPages && result.totalPages > 0) {
+        setPage(result.totalPages);
+      } else {
+        setTodos(result.todos);
+      }
       setError('');
     } catch (err) {
       setError(err.message);
@@ -103,6 +123,11 @@ function App() {
           </li>
         ))}
       </ul>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem' }}>
+        <button disabled={page <= 1} onClick={() => setPage(page - 1)}>הקודם</button>
+        <span>עמוד {page} מתוך {totalPages}</span>
+        <button disabled={page >= totalPages} onClick={() => setPage(page + 1)}>הבא</button>
+      </div>
     </div>
   );
 }
