@@ -26,7 +26,7 @@ export const login = (username, password) => request(AUTH_URL, {
   body: JSON.stringify({ username, password })
 });
 
-export const getTodos = () => request(API_URL);
+export const getTodos = (page = 1) => request(`${API_URL}?page=${page}`);
 
 export const createTodo = (title) => request(API_URL, {
   method: 'POST',

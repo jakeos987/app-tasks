@@ -1,8 +1,12 @@
 const todoService = require('../services/todo.service');
 
 const getTodos = async (req, res) => {
-  const todos = await todoService.getAllTodos();
-  res.json(todos);
+  const page = Number(req.query.page || 1);
+  if (!Number.isSafeInteger(page) || page < 1) {
+    return res.status(400).json({ error: 'Page must be a positive integer' });
+  }
+  const result = await todoService.getTodos(page);
+  res.json(result);
 };
 
 const createTodo = async (req, res) => {
