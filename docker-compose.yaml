@@ -6,6 +6,7 @@ services:
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
       JWT_USER: ${JWT_USER:?Set JWT_USER in .env}
       JWT_PASSWORD: ${JWT_PASSWORD:?Set JWT_PASSWORD in .env}
+      TASKS_PER_PAGE: ${TASKS_PER_PAGE:-5}
     ports:
       - "3000:3000"
     volumes:
